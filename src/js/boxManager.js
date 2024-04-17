@@ -36,3 +36,9 @@ class BoxManager {
         return {nome:this.input_nome.value,valor:this.input_valor.value, tipo:this.ToggleBtn.classList.contains("on")};
     }
 }
+
+
+class boxAlert {
+    constructor() {
+    }
+}

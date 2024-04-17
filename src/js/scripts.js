@@ -3,6 +3,7 @@
 
 
 const boxManager = new BoxManager();
+const data = new Data();
 const list = document.querySelector("#list");
 const list_item = document.getElementsByClassName('container');
 const delete_btn = document.getElementsByClassName("delete-icon");
@@ -13,13 +14,14 @@ let VsArray = []; // Valores de saida
 let Ve_sum = 0;
 let Vs_sum = 0;
 let VsTotal = 0;
-function create_list_item({ nome, value, tipo }) {
+function create_list_item({ nome, value, tipo }, save=false) {
     const $item_list = document.createElement("li");
     const $span_campo_nome = document.createElement("span");
     const $span_campo_valor = document.createElement("span");
     const $span_campo_type = document.createElement("span");
     const $span_delete_icon = document.createElement("span");
     let fomatted_value = parseFloat(value)
+    let tipo_string = ""
 
     $item_list.classList.add('container');
     $span_campo_nome.classList.add("title-box");
@@ -34,7 +36,7 @@ function create_list_item({ nome, value, tipo }) {
         $span_campo_type.classList.add("type_entrada");
         $span_campo_type.innerText = "Entrou";
         $span_campo_valor.classList.add("color_entrada");
-
+        tipo_string = "entrada";
         // array 
 
         VeArray.push(fomatted_value)
@@ -42,6 +44,7 @@ function create_list_item({ nome, value, tipo }) {
         $span_campo_type.classList.add("type_saida");
         $span_campo_type.innerText = "Saiu";
         $span_campo_valor.classList.add("color_saida");
+        tipo_string = "saida";
 
         VsArray.push(fomatted_value)
     }
@@ -57,10 +60,15 @@ function create_list_item({ nome, value, tipo }) {
     for (let i = 0; i < list_item.length; i++) {
 
         delete_btn[i].onclick = () => {
+            
             let pai = document.getElementsByClassName('container')[i];
             console.log(pai, i, document.getElementsByClassName('container'));
             let childs = pai.children;
             let tipo = childs[2];
+            let nome = childs[0];
+            data.delete_item(nome.textContent);
+
+
             if (tipo.classList.contains("type_entrada")) {
                 let fomdt_val = parseFloat(__value[i].textContent.replace(/[^0-9]/g, ''));
                 let index = VeArray.indexOf(fomdt_val)
@@ -75,12 +83,21 @@ function create_list_item({ nome, value, tipo }) {
                 }
             }
             updateTotal();
+
+
             pai.remove();
+
 
         }
     }
+    if(save)
+    {
+        data.send(nome,value,tipo_string);
+        data.get_logs();
+    }
     
 }
+
 
 
 function filtrar() {
@@ -130,7 +147,7 @@ function updateTotal() {
         });
     }
     VsTotal = Ve_sum - Vs_sum;
-    document.querySelector("#total_span").textContent = `R$ ${VsTotal}`
+    document.querySelector("#total_span").textContent = `R$ ${Intl.NumberFormat().format(VsTotal)}`
 }
 
 document.querySelectorAll('.item-box').forEach(item => {
@@ -143,6 +160,17 @@ document.querySelectorAll('.item-box').forEach(item => {
     });
 });
 
+(async () => {
+    const logs = await data.get_logs();
+    logs.forEach(item => {
+        create_list_item({
+            nome: item.nome,
+            value: item.value,
+            tipo: item.tipo == "entrada"
+        });
+    })
+})();
+
 document.querySelectorAll('.option').forEach(item => {
     item.addEventListener('click', () => {
         document.querySelectorAll('.on').forEach(ativo => {
@@ -152,13 +180,6 @@ document.querySelectorAll('.option').forEach(item => {
     });
 });
 
-for (let i = 0; i < list_item.length; i++) {
-    delete_btn[i].onclick = () => {
-        let pai = delete_btn[i].parentElement;
-        pai.remove();
-    };
-    console.log(delete_btn[i]);
-}
 
 document.querySelector("#btn_new_value").addEventListener('click', () => {
     boxManager.mostrar();
