@@ -2,10 +2,9 @@ const bodyParser = require("body-parser");
 const express = require("express")
 const sqlite = require("sqlite3");
 const app = express();
-const __dir = "C:/Users/ykaru/OneDrive/Documentos/gestão financeira projeto";
 const Utils = require("./utils/utils.js");
 const colors = require("colors");
-app.use(express.static(__dir + "/src"))
+app.use(express.static("./src"))
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -16,7 +15,7 @@ const utils = new Utils(db);
 //db.run("CREATE TABLE logs (id INTEGER PRIMARY KEY AUTOINCREMENT, nome TEXT UNIQUE, value TEXT, tipo TEXT);");
 
 app.listen('5000', () => {
-    console.log("127.0.0.1 : 5000\n" + "STATUS : ".yellow + "ONLINE".green)
+    console.log("127.0.0.1 : 5000\n" + "STATUS ".yellow + ":" + " ONLINE".green)
 });
 
 app.get('/', (req, res) => {
