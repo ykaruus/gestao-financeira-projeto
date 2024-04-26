@@ -37,7 +37,7 @@ class DataBackEnd {
     delete_item(nome){
         fetch('/delete-item', {
             headers: {
-                "Content-type": "application/x-form-urlencoded"
+                "Content-Type": "application/json",
             },
             method: "POST",
             body: JSON.stringify(
@@ -49,7 +49,7 @@ class DataBackEnd {
             if(response.ok) console.log("request success");
             return response.json()
         }).then(responseJson => {
-            console.log(responseJson)
+            console.log(responseJson.sucess)
         }).catch(err => {
             console.log(err);
         });

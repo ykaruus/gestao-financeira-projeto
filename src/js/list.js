@@ -1,12 +1,13 @@
 class List {
-    constructor(data, VsArray = [], VeArray = [])
+    constructor(data, VsArray, VeArray, Vs_sum, Ve_sum, VsTotal)
     {
         this.data = data;
         this.VeArray = VeArray;
         this.VsArray = VsArray;
-        this.Ve_sum = 0;
-        this.Vs_sum = 0;
-        this.VsTotal = 0;
+        this.Ve_sum = Ve_sum;
+        this.Vs_sum = Vs_sum;
+        this.VsTotal = VsTotal;
+        this.list_element = document.querySelector("#list");
     }
     create_list_item({ nome, value, tipo }, save = false) {
         const $item_list = document.createElement("li");
@@ -50,12 +51,38 @@ class List {
         $item_list.append($span_campo_type);
         $item_list.append($span_delete_icon);
 
-        list.append($item_list);
+        this.list_element.append($item_list);
 
         if (save) {
             this.data.send(nome, value, tipo_string);
         }
 
+    }
+    delete_item_from_array(item, array = []) {
+        let index = array.indexOf(item);
+        if (index > -1) {
+            array.splice(index, 1);
+        }
+    }
+    updateTotal() {
+        if (this.VsArray == undefined || this.VsArray.length == 0) {
+            this.Vs_sum = 0;
+        } else {
+            this.Vs_sum = this.VsArray.reduce((zero, item) => {
+                return zero + item;
+            })
+        }
+        if (this.VeArray == undefined || this.VeArray.length == 0) {
+            this.Ve_sum = 0;
+        } else {
+            this.Ve_sum = this.VeArray.reduce((zero, item) => {
+                return zero + item;
+            });
+        }
+
+        console.log((this.Ve_sum - this.Vs_sum),this.VsArray, this.VeArray);
+        this.VsTotal = (this.Ve_sum - this.Vs_sum);
+        document.querySelector("#total_span").textContent = `R$ ${Intl.NumberFormat().format(this.VsTotal)}`
     }
     deleteBtnItems() {
         document.querySelectorAll(".delete-icon").forEach(item => {
@@ -63,35 +90,19 @@ class List {
                 let pai = item.parentElement;
                 let tipo = pai.children[2];
                 let nome = pai.children[0];
-                let value = pai.children[1].textContent.replace(/[0-9]/g, '').split(" ");
-                let value_formt = parseFloat(value);
+                let value = pai.children[1].textContent.match(/(\d+)/).slice(" ");
+                let value_formt = parseFloat(value[0]);
+                console.log(value_formt, value)
                 if (tipo.classList.contains("type_entrada")) {
-                    delete_item_from_array(value_formt);
+                    this.delete_item_from_array(value_formt, this.VeArray);
                 } else {
-                    delete_item_from_array(value_formt, VsArray)
+                    this.delete_item_from_array(value_formt, this.VsArray);
                 }
-                updateTotal();
+                this.updateTotal();
                 pai.remove();
-                this.data.delete_item(nome.textContent);
+                this.data.delete_item(value);
             });
         });
     }
-    updateTotal() {
-        if (VsArray == undefined || VsArray.length == 0) {
-            this.Vs_sum = 0;
-        } else {
-            this.Vs_sum = VsArray.reduce((zero, item) => {
-                return zero + item;
-            })
-        }
-        if (VeArray == undefined || VeArray.length == 0) {
-            this.Ve_sum = 0
-        } else {
-            this.Ve_sum = VeArray.reduce((zero, item) => {
-                return zero + item;
-            });
-        }
-        this.VsTotal = Ve_sum - Vs_sum;
-        document.querySelector("#total_span").textContent = `R$ ${Intl.NumberFormat().format(this.VsTotal)}`
-    }
+
 }

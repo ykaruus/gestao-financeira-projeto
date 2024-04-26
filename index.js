@@ -69,7 +69,7 @@ app.get('/registro', (req, res) => {
 
 app.post('/delete-item', async (req, res) => {
     const id_sql = req.body.id;
-    let isSucess = utils.delete_items(id_sql);
+    let isSucess = await utils.delete_items(id_sql);
     res.json({
         sucess: isSucess
     });

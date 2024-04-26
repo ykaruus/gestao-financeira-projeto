@@ -13,16 +13,12 @@ let VsArray = []; // Valores de saida
 let Ve_sum = 0;
 let Vs_sum = 0;
 let VsTotal = 0;
-const list = new List(data, VsArray, VeArray);
+
 const boxManager = new BoxValue();
 const data = new DataBackEnd();
+const list = new List(data, VsArray, VeArray, Vs_sum, Ve_sum,VsTotal);
 
-function delete_item_from_array(item, array = VeArray) {
-    let index = array.indexOf(item);
-    if (index > -1) {
-        array.splice(index, 1);
-    }
-}
+
 
 function filtrar() {
     switch (getTextOfitembox()) {
@@ -91,7 +87,8 @@ document.querySelector("#save_btn").addEventListener('click', () => {
             value: boxManager.pegarValores().valor,
             tipo: boxManager.pegarValores().tipo
         }, true);
-        updateTotal();
+        list.updateTotal();
+        list.deleteBtnItems();
         boxManager.esconder();
 
     } else {
@@ -116,3 +113,12 @@ function getTextOfitembox() {
     return resul
 }
 
+// LOAD LOGS 
+
+
+/*(async () => {
+    const rows= await data.get_logs();
+    rows.forEach(item => {
+        list.create_list_item({item.nome:})
+    })
+})();*/

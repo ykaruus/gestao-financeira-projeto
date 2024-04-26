@@ -21,7 +21,7 @@ class Utils {
                 console.log("Item não encontrada ou erro desconhecido : ", err);
                 sucess = false;
             } else {
-                console.log(`DELETE => [${id}] '/delete-item' => sucess`);
+                console.log(`DELETE => [${id}] '/delete-item' => sucess`.red);
             }
         });
         return sucess;
