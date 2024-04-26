@@ -3,7 +3,7 @@ class Utils {
     {
         this.db = newdb;
         console.clear();
-        console.log("=> A classe utils foi carregado com êxito");
+        console.log("UTILS.JS => A classe utils foi carregado com êxito".blue);
     }
     async insert_table({ nome, valor, tipo }) {
         await this.db.run(`INSERT INTO logs (nome, value, tipo) VALUES (?,?,?);`, [nome,valor,tipo], (err) => {
@@ -13,8 +13,7 @@ class Utils {
             }
         });
     }
-    async delete_items(id="") {
-        id.slice(" ");
+    async delete_items(id) {
         let sucess =true;
         await this.db.run("DELETE FROM logs WHERE nome=?;", [id], (err) => {
             if (err)
@@ -22,7 +21,7 @@ class Utils {
                 console.log("Item não encontrada ou erro desconhecido : ", err);
                 sucess = false;
             } else {
-                console.log("DELETE => '/delete-item' => sucess");
+                console.log(`DELETE => [${id}] '/delete-item' => sucess`);
             }
         });
         return sucess;

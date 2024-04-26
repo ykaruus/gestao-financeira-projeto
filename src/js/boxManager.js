@@ -8,7 +8,16 @@ class BoxValue {
         this.input_nome = this.caixa.querySelector('#nome');
         this.input_valor = this.caixa.querySelector('#valor');
         this.ToggleBtn = this.caixa.querySelector('.option');
-        this.inputs = this.caixa.querySelectorAll('.form-control')
+        this.inputs = this.caixa.querySelectorAll('.form-control');
+
+        document.querySelector("#cancel_btn").addEventListener('click', () => {
+            this.input_nome.value = "";
+            this.input_valor.value = "";
+            this.esconder()
+        });
+        document.querySelector(".close-icon").addEventListener('click', () => {
+            this.esconder()
+        });
     }
     mostrar() {
         this.caixa.classList.add('aparecer')
