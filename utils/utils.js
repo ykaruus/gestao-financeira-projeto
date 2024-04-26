@@ -2,24 +2,30 @@ class Utils {
     constructor(newdb) 
     {
         this.db = newdb;
+        console.clear();
+        console.log("=> A classe utils foi carregado com êxito");
     }
-    create_table()
-    {
-        this.db.exec(
-            `
-            CREATE TABLE logs (
-                id INTERGER PRIMARY KEY,
-                nome TEXT UNIQUE,
-                value FLOAT,
-                tipo TEXT
-            );
-            `
-        );
+    async insert_table({ nome, valor, tipo }) {
+        await this.db.run(`INSERT INTO logs (nome, value, tipo) VALUES (?,?,?);`, [nome,valor,tipo], (err) => {
+            if(err && err.code == "SQLITE_CONSTRAINT")
+            {
+                 console.log(`[WARNING] ${nome} O nome ja é existente`.yellow);
+            }
+        });
     }
-    insert_table({nome,valor,tipo}) {
-        this.db.exec(`
-            INSERT INTO logs (nome, value, tipo) VALUES ();
-        `);
+    async delete_items(id="") {
+        id.slice(" ");
+        let sucess =true;
+        await this.db.run("DELETE FROM logs WHERE nome=?;", [id], (err) => {
+            if (err)
+            {
+                console.log("Item não encontrada ou erro desconhecido : ", err);
+                sucess = false;
+            } else {
+                console.log("DELETE => '/delete-item' => sucess");
+            }
+        });
+        return sucess;
     }
 }
 

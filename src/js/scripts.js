@@ -2,19 +2,18 @@
 
 
 
-const boxManager = new BoxManager();
-const data = new Data();
+const boxManager = new BoxValue();
+const data = new DataBackEnd();
 const list = document.querySelector("#list");
-const list_item = document.getElementsByClassName('container');
-const delete_btn = document.getElementsByClassName("delete-icon");
-const __value = document.getElementsByClassName("val-box");
+const $list_item = document.querySelectorAll('.container');
+const $value = document.getElementsByClassName("val-box");
 const tipo_val = document.querySelectorAll(".tipo");
 let VeArray = []; // Valores de entrada
 let VsArray = []; // Valores de saida
 let Ve_sum = 0;
 let Vs_sum = 0;
 let VsTotal = 0;
-function create_list_item({ nome, value, tipo }, save=false) {
+function create_list_item({ nome, value, tipo }, save = false) {
     const $item_list = document.createElement("li");
     const $span_campo_nome = document.createElement("span");
     const $span_campo_valor = document.createElement("span");
@@ -28,7 +27,7 @@ function create_list_item({ nome, value, tipo }, save=false) {
     $span_campo_valor.classList.add("val-box");
     $span_campo_type.classList.add("tipo");
     $span_delete_icon.classList.add("delete-icon");
-    
+
 
 
 
@@ -57,74 +56,65 @@ function create_list_item({ nome, value, tipo }, save=false) {
     $item_list.append($span_delete_icon);
 
     list.append($item_list);
-    for (let i = 0; i < list_item.length; i++) {
 
-        delete_btn[i].onclick = () => {
-            
-            let pai = document.getElementsByClassName('container')[i];
-            console.log(pai, i, document.getElementsByClassName('container'));
-            let childs = pai.children;
-            let tipo = childs[2];
-            let nome = childs[0];
-            data.delete_item(nome.textContent);
+    if (save) {
+        data.send(nome, value, tipo_string);
+    }
 
+}
+function deleteBtnItems() {
 
+    document.querySelectorAll(".delete-icon").forEach(item => {
+        item.addEventListener('click', () => {
+            let pai = item.parentElement;
+            let tipo = pai.children[2];
+            let nome = pai.children[0];
+            let value = pai.children[1].textContent.replace(/[0-9]/g, '').split(" ");
+            let value_formt = parseFloat(value);
             if (tipo.classList.contains("type_entrada")) {
-                let fomdt_val = parseFloat(__value[i].textContent.replace(/[^0-9]/g, ''));
-                let index = VeArray.indexOf(fomdt_val)
-                if (index > -1) {
-                    VeArray.splice(index, 1);
-                }
+                delete_item_from_array(value_formt);
             } else {
-                let fomdt_val = parseFloat(__value[i].textContent.replace(/[^0-9]/g, ''));
-                let index = VsArray.indexOf(fomdt_val)
-                if (index > -1) {
-                    VsArray.splice(index, 1)
-                }
+                delete_item_from_array(value_formt, VsArray)
             }
             updateTotal();
-
-
             pai.remove();
-
-
-        }
-    }
-    if(save)
-    {
-        data.send(nome,value,tipo_string);
-        data.get_logs();
-    }
-    
+            console.log(`${nome.textContent} foi clicacado`)
+            data.delete_item(nome.textContent);
+        });
+    });
 }
 
-
+function delete_item_from_array(item, array=VeArray) 
+{
+    let index = array.indexOf(item);
+    if(index > -1) 
+    {
+        array.splice(index, 1);
+    }
+}
 
 function filtrar() {
-    if(getTextOfitembox() == "Entradas")
-    {
+    if (getTextOfitembox() == "Entradas") {
         remove_invisible(document.querySelectorAll('.type_saida'));
         set_invisible(document.querySelectorAll('.type_entrada'));
     }
-    if(getTextOfitembox() == "Todos") {
+    if (getTextOfitembox() == "Todos") {
         remove_invisible(document.querySelectorAll('.type_entrada'));
         remove_invisible(document.querySelectorAll('.type_saida'));
     }
-    if(getTextOfitembox() == "Saidas"){
+    if (getTextOfitembox() == "Saidas") {
         remove_invisible(document.querySelectorAll('.type_entrada'));
         set_invisible(document.querySelectorAll('.type_saida'));
     }
 }
 
-function set_invisible(obj)
-{
+function set_invisible(obj) {
     obj.forEach(item => {
         let pai = item.parentElement;
         pai.classList.add("invisible");
     });
 }
-function remove_invisible(obj)
-{
+function remove_invisible(obj) {
     obj.forEach(item => {
         let pai = item.parentElement;
         pai.classList.remove("invisible");
@@ -160,16 +150,7 @@ document.querySelectorAll('.item-box').forEach(item => {
     });
 });
 
-(async () => {
-    const logs = await data.get_logs();
-    logs.forEach(item => {
-        create_list_item({
-            nome: item.nome,
-            value: item.value,
-            tipo: item.tipo == "entrada"
-        });
-    })
-})();
+
 
 document.querySelectorAll('.option').forEach(item => {
     item.addEventListener('click', () => {
@@ -198,11 +179,12 @@ document.querySelector("#save_btn").addEventListener('click', () => {
             nome: boxManager.pegarValores().nome,
             value: boxManager.pegarValores().valor,
             tipo: boxManager.pegarValores().tipo
-        });
+        }, true);
         updateTotal();
         console.log(VeArray, VsArray);
         boxManager.esconder();
         filtrar();
+        deleteBtnItems();
     } else {
         alert("CHEQUE OS DADOS!");
     }
@@ -224,3 +206,16 @@ function getTextOfitembox() {
 
     return resul
 }
+
+(async () => {
+    try {
+        const rows = await data.get_logs()
+        rows.forEach(item => {
+            create_list_item({nome: item.nome,value:item.value,tipo:item.tipo}, false);
+        });
+    } catch (error) {
+        console.error(error);
+    }
+    deleteBtnItems();
+    updateTotal();
+})();

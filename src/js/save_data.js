@@ -1,8 +1,8 @@
 
 
-class Data {
-    send(name,value,type) {
-        fetch('/registro', 
+class DataBackEnd {
+    async send(name,value,type) {
+        await fetch('/registro', 
         {
             headers: {
                 "Content-Type": "application/json",
@@ -11,10 +11,13 @@ class Data {
             body: JSON.stringify({nome:name,valor:value,tipo:type})
         }).then(response => {
             if(response.ok) {
-                console.log('sucess');
+                console.log("Requisição HTTP POST -> '/registro' ");
             }
-            console.log(response.body);
-        }).catch(error => {
+            return response.json();
+        }).then(responseJson => {
+            console.log(responseJson)
+        })
+        .catch(error => {
             console.log(error);
         });
     }
@@ -32,14 +35,23 @@ class Data {
         return response;
     }
     delete_item(nome){
-        fetch('/delete-item/', {
+        fetch('/delete-item', {
             headers: {
                 "Content-type": "application/x-form-urlencoded"
             },
-            method: "DELETE",
-            body: JSON.stringify({
-                id: nome
-            })
-        })
+            method: "POST",
+            body: JSON.stringify(
+                {
+                    id : nome
+                }
+            )
+        }).then(response => {
+            if(response.ok) console.log("request success");
+            return response.json()
+        }).then(responseJson => {
+            console.log(responseJson)
+        }).catch(err => {
+            console.log(err);
+        });
     }
 }

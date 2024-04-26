@@ -1,6 +1,6 @@
 
 
-class BoxManager {
+class BoxValue {
     constructor()
     {
         this.fundo = document.querySelector('.fundo');
@@ -24,6 +24,8 @@ class BoxManager {
             console.log()
             if(!item.value)
             {
+                validy = false;
+            }else if(item.value.length > 10){
                 validy = false;
             } else {
                 validy =true;
