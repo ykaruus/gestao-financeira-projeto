@@ -4,6 +4,7 @@ const sqlite = require("sqlite3");
 const app = express();
 const Utils = require("./utils/utils.js");
 const colors = require("colors");
+
 app.use(express.static("./src"))
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -15,7 +16,7 @@ const utils = new Utils(db);
 //db.run("CREATE TABLE logs (id INTEGER PRIMARY KEY AUTOINCREMENT, nome TEXT UNIQUE, value TEXT, tipo TEXT);");
 
 app.listen('5000', () => {
-    console.log("127.0.0.1 : 5000\n" + "STATUS ".yellow + ":" + " ONLINE".green)
+    console.log("http://127.0.0.1:5000\n" + "status ".yellow + ":" + " online".green)
 });
 
 app.get('/', (req, res) => {
@@ -35,7 +36,7 @@ app.post('/registro', async (req, res) => {
     }
     console.log(`BUFFER STRING => ${name.length} ${val.length}`.cyan)
     if (name.length > 10 || val.length > 10) {
-        console.log("O tamanho dos dados ultrapassou o limite".red);
+        console.log("/registro => O tamanho dos dados ultrapassou o limite".red);
         payload.error_code = "length>10"
         res.json(payload)
     } else {
@@ -67,8 +68,8 @@ app.get('/registro', (req, res) => {
     });
 });
 
-app.post('/delete-item', async (req, res) => {
-    const id_sql = req.body.id;
+app.put('/delete-item/:id', async (req, res) => {
+    const id_sql = req.params.id;
     let isSucess = await utils.delete_items(id_sql);
     res.json({
         sucess: isSucess
